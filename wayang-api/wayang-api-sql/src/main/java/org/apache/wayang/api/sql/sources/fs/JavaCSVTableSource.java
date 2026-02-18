@@ -205,12 +205,12 @@ public class JavaCSVTableSource<T> extends UnarySource<T> implements JavaExecuti
             final String headerLine = lineIterator.next(); // read header row
             final String[] headerColumns = headerLine.split(","); // split header row into columns
 
-            if (headerColumns.length != fieldTypes.size()) {
+            if (headerColumns.length == 1 && headerLine.contains(String.valueOf(separator))) {
                 throw new IllegalStateException(String.format(
-                        "CSV file '%s': header has %d comma-separated columns but table schema expects %d. "
-                        + "Ensure the header uses commas with typed columns "
-                        + "(e.g., 'id:int,name:string,email:string,country:string'). Header: '%s'.",
-                        sourcePath, headerColumns.length, fieldTypes.size(), headerLine));
+                        "CSV file '%s': header uses '%s' as separator, but Calcite requires commas. "
+                        + "Header: '%s'. "
+                        + "Expected format: %s.",
+                        sourcePath, separator, headerLine, headerLine.replace(String.valueOf(separator), ",")));
             }
 
             for (final String column : headerColumns) {
